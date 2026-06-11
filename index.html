@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#1a2e1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Cotizador JD</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --vd:#2d5a1b; --vo:#1a3610; --vc:#4a8c2a;
+  --am:#f4c430; --bg:#0e1a0a; --bg2:#162010; --bg3:#1e2d14;
+  --ca:#1f2e14; --cb:#263818; --br:#2e4420;
+  --t1:#e8f0e0; --t2:#a8c490; --t3:#6a8a55;
+  --r:16px; --rs:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;
+  display:flex;flex-direction:column;max-width:480px;margin:0 auto;overflow-x:hidden}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,var(--vo),var(--bg2));border-bottom:2px solid var(--am);
+  padding:14px 18px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100}
+.hdr-brand{display:flex;align-items:center;gap:10px}
+.jd{background:var(--am);color:var(--vo);font-family:'Syne',sans-serif;font-weight:800;
+  font-size:13px;padding:4px 9px;border-radius:6px}
+.hdr-title{font-family:'Syne',sans-serif;font-weight:700;font-size:16px}
+.hdr-sub{font-size:10px;color:var(--t3);margin-top:1px}
+.hdr-right{display:flex;gap:8px}
+.ico-btn{background:var(--ca);border:1px solid var(--br);border-radius:9px;width:36px;height:36px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--t2)}
+
+/* LOGIN */
+.login-screen{position:fixed;inset:0;background:var(--bg);z-index:500;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:24px}
+.login-logo{display:flex;flex-direction:column;align-items:center;gap:8px}
+.login-jd{background:var(--am);color:var(--vo);font-family:'Syne',sans-serif;font-weight:800;
+  font-size:22px;padding:8px 18px;border-radius:10px}
+.login-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--t1)}
+.login-sub{font-size:12px;color:var(--t3);text-align:center}
+.login-card{background:var(--ca);border:1px solid var(--br);border-radius:var(--r);
+  padding:24px;width:100%;max-width:340px}
+.login-label{font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.6px;
+  text-transform:uppercase;margin-bottom:8px}
+.pin-display{background:var(--bg3);border:1.5px solid var(--br);border-radius:var(--rs);
+  padding:14px;text-align:center;font-family:'Syne',sans-serif;font-size:28px;
+  letter-spacing:12px;color:var(--t1);margin-bottom:16px;min-height:58px}
+.pinpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.pin-key{background:var(--cb);border:1px solid var(--br);border-radius:var(--rs);
+  padding:16px;font-size:20px;font-weight:600;text-align:center;cursor:pointer;
+  color:var(--t1);transition:all .15s;user-select:none}
+.pin-key:active{background:var(--vd);transform:scale(.95)}
+.pin-key.del{font-size:16px;color:var(--t3)}
+.pin-key.zero{grid-column:2}
+.pin-enter{width:100%;background:var(--am);color:var(--vo);border:none;border-radius:var(--rs);
+  padding:14px;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;cursor:pointer}
+.pin-enter:disabled{opacity:.4;cursor:not-allowed}
+.pin-error{color:#e57070;font-size:12px;text-align:center;margin-top:8px;min-height:18px}
+
+/* MAIN */
+.main{flex:1;padding:14px;display:flex;flex-direction:column;gap:12px;padding-bottom:100px}
+
+/* STATUS BAR */
+.status-bar{border-radius:var(--rs);padding:9px 13px;font-size:11px;
+  display:flex;align-items:center;justify-content:space-between;border:1px solid}
+.sb-ok{background:rgba(45,90,27,.25);border-color:var(--vd);color:var(--t2)}
+.sb-load{background:var(--ca);border-color:var(--br);color:var(--t3)}
+.sb-err{background:rgba(192,57,43,.15);border-color:rgba(192,57,43,.4);color:#e57070}
+.sb-left{display:flex;align-items:center;gap:7px}
+.sb-dot{width:7px;height:7px;border-radius:50%}
+.dot-ok{background:#5db84a} .dot-spin{background:var(--am);animation:blink 1s infinite}
+.dot-err{background:#e57070}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.vendedor-chip{background:var(--cb);border:1px solid var(--br);border-radius:12px;
+  padding:3px 10px;font-size:10px;font-weight:600;color:var(--t2)}
+
+/* VOZ */
+.voice-sec{display:flex;flex-direction:column;align-items:center;gap:10px;padding:6px 0}
+.mic-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+.mic-rings{position:absolute;width:110px;height:110px;border-radius:50%;opacity:0;pointer-events:none}
+.mic-rings.on{opacity:1}
+.mic-rings::before,.mic-rings::after{content:'';position:absolute;inset:0;border-radius:50%;
+  border:2px solid var(--vc);animation:ripple 1.5s ease-out infinite}
+.mic-rings::after{animation-delay:.5s}
+@keyframes ripple{0%{transform:scale(.8);opacity:.8}100%{transform:scale(1.7);opacity:0}}
+.mic-btn{width:84px;height:84px;border-radius:50%;border:2px solid var(--br);background:var(--ca);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;
+  gap:3px;transition:all .2s;position:relative;z-index:2}
+.mic-btn.rec{background:var(--vd);border-color:var(--vc);box-shadow:0 0 20px rgba(74,140,42,.4)}
+.mic-btn.think{background:#1a1200;border-color:var(--am);animation:tpulse 1s ease-in-out infinite alternate}
+.mic-btn.dis{opacity:.35;cursor:not-allowed}
+@keyframes tpulse{from{box-shadow:0 0 8px rgba(244,196,48,.2)}to{box-shadow:0 0 22px rgba(244,196,48,.5)}}
+.mic-ico{font-size:26px;line-height:1}
+.mic-lbl{font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--t3)}
+.mic-btn.rec .mic-lbl{color:var(--t2)} .mic-btn.think .mic-lbl{color:var(--am)}
+.voice-hint{font-size:12px;color:var(--t3);text-align:center;max-width:260px;line-height:1.5}
+
+/* TRANSCRIPT */
+.tr-box{background:var(--ca);border:1px solid var(--br);border-radius:var(--r);padding:13px;display:none}
+.tr-box.on{display:block}
+.tr-lbl{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.7px;text-transform:uppercase;margin-bottom:5px}
+.tr-txt{font-size:14px;color:var(--t1);line-height:1.5;font-style:italic}
+
+/* CHIPS */
+.chips-lbl{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.7px;text-transform:uppercase;margin-bottom:7px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--ca);border:1px solid var(--br);border-radius:18px;padding:6px 11px;
+  font-size:12px;color:var(--t2);cursor:pointer;transition:all .2s;line-height:1.3}
+.chip:active,.chip:hover{background:var(--vd);border-color:var(--vc);color:#fff}
+
+/* RESULTADO */
+.res-sec{display:none} .res-sec.on{display:block}
+.res-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.res-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--am)}
+.speak-btn{background:var(--cb);border:1px solid var(--br);border-radius:8px;
+  padding:5px 9px;font-size:11px;color:var(--t2);cursor:pointer}
+
+/* MAQUINA CARD */
+.maq-card{background:var(--cb);border:1px solid var(--br);border-radius:var(--r);padding:13px;margin-bottom:9px}
+.maq-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.maq-info{flex:1}
+.maq-cod{font-size:10px;font-weight:700;color:var(--am);letter-spacing:1px;margin-bottom:3px}
+.maq-nom{font-size:14px;font-weight:600;color:var(--t1);line-height:1.3;margin-bottom:3px}
+.maq-desc{font-size:11px;color:var(--t3);line-height:1.4}
+.maq-px{text-align:right;white-space:nowrap}
+.px-usd{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:#fff}
+.px-lbl{font-size:9px;color:var(--t3)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;
+  padding:3px 8px;border-radius:12px;margin-top:7px;border:1px solid}
+.b-stock{background:rgba(45,90,27,.4);color:#7fc45e;border-color:var(--vd)}
+.b-pedido{background:rgba(139,105,20,.3);color:#e0b44a;border-color:#8b6914}
+.b-exc{background:rgba(45,90,27,.4);color:#7fc45e;border-color:var(--vd)}
+.b-mb{background:rgba(45,90,27,.3);color:#9ed678;border-color:#3a6020}
+.b-bue{background:rgba(60,80,20,.4);color:#b8cc70;border-color:#4a5a18}
+.b-reg{background:rgba(139,105,20,.3);color:#e0b44a;border-color:#8b6914}
+
+/* FINANCIACION */
+.banco-hdr{display:flex;align-items:center;gap:8px;margin:4px 0 8px}
+.banco-nm{font-size:13px;font-weight:700;color:var(--t1)}
+.banco-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px}
+.bb-bna{background:rgba(0,100,200,.3);color:#7aaef0;border:1px solid rgba(0,100,200,.4)}
+.bb-gal{background:rgba(200,0,50,.25);color:#f07090;border:1px solid rgba(200,0,50,.3)}
+.lin-card{background:var(--bg3);border:1px solid var(--br);border-radius:var(--rs);padding:11px;margin-bottom:7px}
+.lin-nom{font-size:12px;font-weight:600;color:var(--t1);margin-bottom:7px}
+.lin-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:7px}
+.d-lbl{font-size:9px;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px}
+.d-val{font-size:14px;font-weight:700;color:var(--t1)}
+.d-val.hl{color:var(--am)}
+.cuota-ban{background:linear-gradient(135deg,var(--vd),var(--vo));border:1px solid var(--vc);
+  border-radius:var(--rs);padding:9px 13px;display:flex;align-items:center;
+  justify-content:space-between;margin-bottom:5px}
+.cuota-txt{font-size:11px;color:var(--t2)}
+.cuota-cap{font-size:10px;color:var(--t3);margin-top:1px}
+.cuota-monto{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff}
+.cuota-mes{font-size:10px;color:var(--t2);text-align:right}
+.ant-row{display:flex;justify-content:space-between;padding:5px 0;
+  border-top:1px solid var(--br);font-size:11px;color:var(--t3)}
+.ant-val{font-weight:600;color:var(--t2)}
+.obs-txt{font-size:10px;color:var(--t3);font-style:italic;line-height:1.4;
+  padding-top:5px;border-top:1px solid var(--br);margin-top:2px}
+.sep{height:1px;background:var(--br);margin:3px 0 11px}
+
+/* AI BUBBLE */
+.ai-bub{background:var(--cb);border:1px solid var(--vd);border-radius:var(--r);
+  padding:13px;border-left:3px solid var(--vc)}
+.ai-lbl{font-size:9px;font-weight:700;color:var(--vc);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}
+.ai-txt{font-size:13px;color:var(--t1);line-height:1.6;white-space:pre-wrap}
+
+/* HISTORIAL */
+.hist-card{background:var(--ca);border:1px solid var(--br);border-radius:var(--r);padding:13px}
+.hist-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--am);margin-bottom:12px}
+.hist-item{border-bottom:1px solid var(--br);padding:9px 0;display:flex;gap:10px;align-items:flex-start}
+.hist-item:last-child{border-bottom:none}
+.hist-ico{font-size:18px;flex-shrink:0;margin-top:2px}
+.hist-info{flex:1}
+.hist-vend{font-size:10px;font-weight:600;color:var(--am);letter-spacing:.5px;text-transform:uppercase}
+.hist-maq{font-size:13px;font-weight:600;color:var(--t1);margin:2px 0}
+.hist-det{font-size:11px;color:var(--t3);line-height:1.4}
+.hist-fecha{font-size:10px;color:var(--t3);text-align:right;white-space:nowrap;flex-shrink:0}
+.hist-empty{text-align:center;padding:24px;color:var(--t3);font-size:13px}
+
+/* LOADING */
+.ld-dots{display:inline-flex;gap:4px;align-items:center}
+.ld-dots span{width:6px;height:6px;border-radius:50%;background:var(--am);
+  animation:dp 1.2s ease-in-out infinite}
+.ld-dots span:nth-child(2){animation-delay:.2s}
+.ld-dots span:nth-child(3){animation-delay:.4s}
+@keyframes dp{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
+
+/* ERROR */
+.err-box{background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.4);
+  border-radius:var(--rs);padding:11px;font-size:13px;color:#e57070;display:none}
+.err-box.on{display:block}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;
+  display:none;align-items:flex-end;justify-content:center}
+.modal-ov.on{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--br);border-top-left-radius:22px;
+  border-top-right-radius:22px;padding:22px 18px 38px;width:100%;max-width:480px;
+  max-height:88vh;overflow-y:auto}
+.modal-handle{width:38px;height:4px;background:var(--br);border-radius:2px;margin:0 auto 18px}
+.modal-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--t1);margin-bottom:14px}
+.modal-lbl{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.5px;
+  text-transform:uppercase;margin-bottom:5px;margin-top:12px}
+.modal-inp{width:100%;background:var(--ca);border:1px solid var(--br);border-radius:var(--rs);
+  color:var(--t1);font-size:12px;padding:10px 12px;font-family:monospace;outline:none}
+.modal-inp:focus{border-color:var(--am)}
+.modal-hint{font-size:10px;color:var(--t3);line-height:1.4;margin-top:4px}
+.modal-save{width:100%;background:var(--am);color:var(--vo);border:none;border-radius:var(--rs);
+  padding:13px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Syne',sans-serif;margin-top:14px}
+.modal-sec-btn{width:100%;background:var(--cb);color:var(--t2);border:1px solid var(--br);
+  border-radius:var(--rs);padding:11px;font-size:13px;cursor:pointer;margin-top:8px}
+.modal-close{width:100%;background:transparent;color:var(--t3);border:1px solid var(--br);
+  border-radius:var(--rs);padding:11px;font-size:13px;cursor:pointer;margin-top:6px}
+
+/* ADMIN PANEL */
+.admin-screen{position:fixed;inset:0;background:var(--bg);z-index:400;
+  display:none;flex-direction:column;overflow:hidden}
+.admin-screen.on{display:flex}
+.admin-hdr{background:linear-gradient(135deg,#1a0a00,#2a1500);border-bottom:2px solid var(--am);
+  padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.admin-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--am)}
+.admin-close{background:var(--ca);border:1px solid var(--br);border-radius:8px;
+  padding:6px 12px;font-size:13px;color:var(--t2);cursor:pointer}
+.admin-tabs{display:flex;border-bottom:1px solid var(--br);flex-shrink:0}
+.admin-tab{flex:1;padding:11px;text-align:center;font-size:12px;font-weight:600;
+  color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.admin-tab.on{color:var(--am);border-bottom-color:var(--am)}
+.admin-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.admin-section{background:var(--ca);border:1px solid var(--br);border-radius:var(--r);padding:14px}
+.admin-sec-title{font-size:12px;font-weight:700;color:var(--am);letter-spacing:.6px;
+  text-transform:uppercase;margin-bottom:12px}
+/* Vendedores */
+.vend-item{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0;border-bottom:1px solid var(--br)}
+.vend-item:last-child{border-bottom:none}
+.vend-info{flex:1}
+.vend-nombre{font-size:14px;font-weight:600;color:var(--t1)}
+.vend-pin{font-size:11px;color:var(--t3);margin-top:2px;font-family:monospace}
+.vend-actions{display:flex;gap:6px}
+.vend-btn{border:1px solid var(--br);border-radius:7px;padding:5px 10px;
+  font-size:11px;cursor:pointer;background:var(--cb)}
+.vend-btn.del{color:#e57070;border-color:rgba(192,57,43,.4)}
+.vend-btn.tog{color:var(--t2)}
+.add-vend-form{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.add-inp{background:var(--bg3);border:1px solid var(--br);border-radius:var(--rs);
+  color:var(--t1);font-size:13px;padding:9px 11px;outline:none;flex:1;min-width:100px}
+.add-inp:focus{border-color:var(--am)}
+.add-btn{background:var(--am);color:var(--vo);border:none;border-radius:var(--rs);
+  padding:9px 16px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+/* Historial admin */
+.hist-filters{display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap}
+.filter-sel{background:var(--bg3);border:1px solid var(--br);border-radius:var(--rs);
+  color:var(--t1);font-size:12px;padding:7px 10px;outline:none;flex:1}
+.export-btn{background:var(--cb);border:1px solid var(--br);border-radius:var(--rs);
+  color:var(--t2);font-size:12px;padding:7px 12px;cursor:pointer;white-space:nowrap}
+.hist-table{width:100%;border-collapse:collapse;font-size:11px}
+.hist-table th{color:var(--t3);font-weight:600;letter-spacing:.5px;text-transform:uppercase;
+  padding:6px 4px;border-bottom:1px solid var(--br);text-align:left}
+.hist-table td{padding:8px 4px;border-bottom:1px solid var(--br);color:var(--t1);vertical-align:top}
+.hist-table tr:last-child td{border-bottom:none}
+.tag-vend{background:rgba(244,196,48,.15);color:var(--am);border-radius:10px;
+  padding:2px 7px;font-size:10px;font-weight:600}
+/* API key admin */
+.api-row{display:flex;gap:8px;margin-top:4px}
+.api-inp{flex:1;background:var(--bg3);border:1px solid var(--br);border-radius:var(--rs);
+  color:var(--t1);font-size:12px;padding:9px 11px;font-family:monospace;outline:none}
+.api-inp:focus{border-color:var(--am)}
+.api-save{background:var(--am);color:var(--vo);border:none;border-radius:var(--rs);
+  padding:9px 14px;font-weight:700;font-size:13px;cursor:pointer}
+.api-hint{font-size:10px;color:var(--t3);margin-top:5px;line-height:1.4}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat-item{background:var(--bg3);border:1px solid var(--br);border-radius:var(--rs);padding:12px}
+.stat-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--am)}
+.stat-lbl{font-size:10px;color:var(--t3);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+
+/* FAB */
+.fab{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;
+  padding:10px 18px 26px;background:linear-gradient(to top,var(--bg) 55%,transparent);
+  display:flex;justify-content:center}
+.nueva-btn{background:var(--ca);border:1px solid var(--br);border-radius:22px;padding:9px 20px;
+  font-size:13px;font-weight:600;color:var(--t2);cursor:pointer;display:none;gap:6px;align-items:center}
+.nueva-btn.on{display:flex}
+::-webkit-scrollbar{width:0}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-logo">
+    <div class="login-jd">JD</div>
+    <div class="login-title">Cotizador Agro</div>
+    <div class="login-sub">Ingresá tu PIN para continuar</div>
+  </div>
+  <div class="login-card">
+    <div class="login-label">Tu PIN</div>
+    <div class="pin-display" id="pinDisplay">----</div>
+    <div class="pinpad">
+      <div class="pin-key" onclick="pinKey('1')">1</div>
+      <div class="pin-key" onclick="pinKey('2')">2</div>
+      <div class="pin-key" onclick="pinKey('3')">3</div>
+      <div class="pin-key" onclick="pinKey('4')">4</div>
+      <div class="pin-key" onclick="pinKey('5')">5</div>
+      <div class="pin-key" onclick="pinKey('6')">6</div>
+      <div class="pin-key" onclick="pinKey('7')">7</div>
+      <div class="pin-key" onclick="pinKey('8')">8</div>
+      <div class="pin-key" onclick="pinKey('9')">9</div>
+      <div class="pin-key del" onclick="pinDel()">⌫</div>
+      <div class="pin-key zero" onclick="pinKey('0')">0</div>
+    </div>
+    <button class="pin-enter" id="pinEnter" onclick="pinLogin()" disabled>Ingresar</button>
+    <div class="pin-error" id="pinError"></div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-brand">
+    <div class="jd">JD</div>
+    <div>
+      <div class="hdr-title">Cotizador Agro</div>
+      <div class="hdr-sub" id="hdrSub">BNA · GALICIA · VOZ</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <button class="ico-btn" id="adminBtn" onclick="openAdmin()" title="Panel Admin" style="display:none">🛡️</button>
+    <button class="ico-btn" onclick="showHistorial()" title="Historial">📊</button>
+    <button class="ico-btn" onclick="openModal()" title="Configuración">⚙️</button>
+    <button class="ico-btn" onclick="cerrarSesion()" title="Salir">🚪</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="status-bar sb-load" id="statusBar">
+    <div class="sb-left">
+      <div class="sb-dot dot-spin" id="sbDot"></div>
+      <span id="sbTxt">Cargando datos...</span>
+    </div>
+    <div class="vendedor-chip" id="vendedorChip"></div>
+  </div>
+
+  <!-- VOZ -->
+  <div class="voice-sec">
+    <div class="mic-wrap">
+      <div class="mic-rings" id="micRings"></div>
+      <button class="mic-btn dis" id="micBtn" onclick="toggleMic()">
+        <span class="mic-ico" id="micIco">🎙️</span>
+        <span class="mic-lbl" id="micLbl">Hablar</span>
+      </button>
+    </div>
+    <div class="voice-hint" id="voiceHint">Cargando datos...</div>
+  </div>
+
+  <div class="tr-box" id="trBox">
+    <div class="tr-lbl">🎤 Escuché</div>
+    <div class="tr-txt" id="trTxt"></div>
+  </div>
+
+  <div id="loadBox" style="display:none;text-align:center;padding:14px">
+    <div class="ld-dots"><span></span><span></span><span></span></div>
+    <div style="font-size:12px;color:var(--t3);margin-top:7px">Calculando cotización...</div>
+  </div>
+
+  <div class="err-box" id="errBox"></div>
+
+  <div class="res-sec" id="resSec">
+    <div class="res-hdr">
+      <div class="res-title">📋 Cotización</div>
+      <button class="speak-btn" onclick="speakResult()">🔊 Leer</button>
+    </div>
+    <div id="resContent"></div>
+  </div>
+
+  <div id="chipsSection">
+    <div class="chips-lbl">💡 Ejemplos</div>
+    <div class="chips">
+      <div class="chip" onclick="enviarTexto(this.innerText)">Cotizá el tractor 8R en Banco Nación</div>
+      <div class="chip" onclick="enviarTexto(this.innerText)">Leasing para la cosechadora</div>
+      <div class="chip" onclick="enviarTexto(this.innerText)">Sembradora usada a 60 cuotas en Galicia</div>
+      <div class="chip" onclick="enviarTexto(this.innerText)">Qué maquinaria tenemos en stock?</div>
+      <div class="chip" onclick="enviarTexto(this.innerText)">Mejor tasa para la pulverizadora nueva</div>
+      <div class="chip" onclick="enviarTexto(this.innerText)">Todas las líneas para la picadora</div>
+    </div>
+  </div>
+
+  <!-- HISTORIAL -->
+  <div id="histSection" style="display:none">
+    <div class="hist-card">
+      <div class="hist-title">📊 Últimas cotizaciones</div>
+      <div id="histContent"><div class="hist-empty">Cargando...</div></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="fab">
+  <button class="nueva-btn" id="nuevaBtn" onclick="nuevaConsulta()">↩ Nueva consulta</button>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-screen" id="adminScreen">
+  <div class="admin-hdr">
+    <div class="admin-title">⚙️ Panel Admin</div>
+    <button class="admin-close" onclick="closeAdmin()">✕ Cerrar</button>
+  </div>
+  <div class="admin-tabs">
+    <div class="admin-tab on" onclick="adminTab('resumen')" id="tab-resumen">📊 Resumen</div>
+    <div class="admin-tab" onclick="adminTab('vendedores')" id="tab-vendedores">👥 Vendedores</div>
+    <div class="admin-tab" onclick="adminTab('historial')" id="tab-historial">📋 Historial</div>
+    <div class="admin-tab" onclick="adminTab('config')" id="tab-config">🔑 Config</div>
+  </div>
+  <div class="admin-body" id="adminBody"></div>
+</div>
+
+<div class="modal-ov" id="modalOv" onclick="closeModalOut(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚙️ Configuración</div>
+    <div class="modal-lbl">API Key de Anthropic</div>
+    <input type="password" class="modal-inp" id="apiKeyMod" placeholder="sk-ant-api03-..." />
+    <div class="modal-hint">console.anthropic.com · se guarda solo en este dispositivo</div>
+    <button class="modal-save" onclick="saveModal()">Guardar</button>
+    <button class="modal-sec-btn" onclick="recargarDatos()">🔄 Recargar datos de Supabase</button>
+    <button class="modal-close" onclick="closeModal()">Cancelar</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  CONFIG SUPABASE
+// ══════════════════════════════════════════════
+const SB_URL  = "https://jwfollikhtjbqeqbkmob.supabase.co";
+const SB_KEY  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3Zm9sbGlraHRqYnFlcWJrbW9iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNTM2MzUsImV4cCI6MjA5NjYyOTYzNX0.wlMVtXxlOwzJOpUo1D9NNDyjQHkBMnKPelQDarZGjCc";
+// ── API KEY ANTHROPIC — reemplazá con la tuya ──
+
+// ── PIN DE ADMIN — para acceder al panel de gestión ──
+const ADMIN_PIN = "0000";
+const SB_HDR  = { "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}`, "Content-Type": "application/json" };
+
+
+async function sbPost(tabla, data) {
+  const r = await fetch(`${SB_URL}/rest/v1/${tabla}`, {
+    method: "POST", headers: { ...SB_HDR, "Prefer": "return=minimal" }, body: JSON.stringify(data)
+  });
+  return r.status;
+}
+
+// ══════════════════════════════════════════════
+//  ESTADO
+// ══════════════════════════════════════════════
+let MAQUINARIA = [], FINANCIACION = [], VENDEDORES = [];
+let datosListos = false;
+let vendedorActual = null;
+let pinActual = "";
+
+const S = { get: k => localStorage.getItem("jd_" + k) || "", set: (k,v) => localStorage.setItem("jd_"+k,v) };
+
+// ══════════════════════════════════════════════
+//  LOGIN PIN
+// ══════════════════════════════════════════════
+function pinKey(d) {
+  if (pinActual.length >= 4) return;
+  pinActual += d;
+  renderPin();
+}
+function pinDel() {
+  pinActual = pinActual.slice(0,-1);
+  renderPin();
+}
+function renderPin() {
+  const stars = pinActual.replace(/./g,"●").padEnd(4,"─").split("").join(" ");
+  document.getElementById("pinDisplay").innerText = stars;
+  document.getElementById("pinEnter").disabled = pinActual.length < 4;
+  document.getElementById("pinError").innerText = "";
+}
+async function pinLogin() {
+  const pin = pinActual;
+  try {
+    const res = await sbGet("vendedores", `pin=eq.${pin}&activo=eq.true&select=id,nombre`);
+    if (!res.length) {
+      document.getElementById("pinError").innerText = "PIN incorrecto";
+      pinActual = "";
+      renderPin();
+      return;
+    }
+    vendedorActual = res[0];
+    S.set("vendedorId", vendedorActual.id);
+    S.set("vendedorNombre", vendedorActual.nombre);
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("vendedorChip").innerText = vendedorActual.nombre;
+    document.getElementById("hdrSub").innerText = vendedorActual.nombre + " · BNA · GALICIA";
+    // Mostrar botón admin si es el PIN de admin
+    if (pin === ADMIN_PIN) {
+      document.getElementById("adminBtn").style.display = "flex";
+      S.set("isAdmin","1");
+    }
+    cargarDatos();
+  } catch(e) {
+    document.getElementById("pinError").innerText = "Error de conexión";
+  }
+}
+
+function cerrarSesion() {
+  vendedorActual = null;
+  pinActual = "";
+  S.set("vendedorId",""); S.set("vendedorNombre",""); S.set("isAdmin","");
+  renderPin();
+  document.getElementById("loginScreen").style.display = "flex";
+  document.getElementById("vendedorChip").innerText = "";
+  document.getElementById("adminBtn").style.display = "none";
+}
+
+// ══════════════════════════════════════════════
+//  CARGAR DATOS SUPABASE
+// ══════════════════════════════════════════════
+async function cargarDatos(silencioso = false) {
+  if (!silencioso) setStatus("load","Cargando datos de Supabase...");
+  try {
+    const [maq, fin] = await Promise.all([
+      sbGet("maquinaria", "activo=eq.true&order=codigo"),
+      sbGet("financiacion", "activo=eq.true&order=banco,linea")
+    ]);
+    MAQUINARIA = maq;
+    FINANCIACION = fin;
+    datosListos = true;
+    setStatus("ok", `${maq.length} máquinas · ${fin.length} líneas`);
+    setMicDis(false);
+    document.getElementById("voiceHint").innerText = "Presioná y decí qué querés cotizar.";
+    if (!silencioso) showToast("✅ Datos actualizados");
+  } catch(e) {
+    setStatus("err","Error al conectar con Supabase");
+    document.getElementById("voiceHint").innerText = "Sin conexión. Verificá configuración en ⚙️";
+  }
+}
+
+function setStatus(tipo, msg) {
+  const el = document.getElementById("statusBar");
+  const dot = document.getElementById("sbDot");
+  el.className = "status-bar " + (tipo==="ok"?"sb-ok":tipo==="err"?"sb-err":"sb-load");
+  dot.className = "sb-dot " + (tipo==="ok"?"dot-ok":tipo==="err"?"dot-err":"dot-spin");
+  document.getElementById("sbTxt").innerText = msg;
+}
+
+// ══════════════════════════════════════════════
+//  GUARDAR COTIZACIÓN EN SUPABASE
+// ══════════════════════════════════════════════
+async function guardarCotizacion(consulta, parsed) {
+  if (!vendedorActual) return;
+  const maq = parsed.maquinas?.[0];
+  const primerBanco = Object.keys(parsed.bancos || {})[0];
+  const primeraLinea = primerBanco ? parsed.bancos[primerBanco]?.[0] : null;
+
+  await sbPost("cotizaciones", {
+    vendedor_id:     vendedorActual.id,
+    vendedor_nombre: vendedorActual.nombre,
+    consulta_texto:  consulta,
+    maquinaria_cod:  maq?.codigo || null,
+    maquinaria_nom:  maq?.modelo || maq?.descripcion || null,
+    banco:           primerBanco || null,
+    linea:           primeraLinea?.linea || null,
+    precio_usd:      maq ? parseFloat(maq.precio_usd) : null,
+    tna_pct:         primeraLinea ? parseFloat(primeraLinea.tna_pct) : null,
+    plazo_meses:     primeraLinea ? parseInt(primeraLinea.plazo_meses) : null,
+    cuota_estimada:  primeraLinea?.cuotaEstimada || null,
+    anticipo_usd:    (maq && primeraLinea) ? parseFloat(maq.precio_usd)*(parseFloat(primeraLinea.anticipo_min_pct)/100) : null,
+  }).catch(()=>{});
+}
+
+// ══════════════════════════════════════════════
+//  HISTORIAL
+// ══════════════════════════════════════════════
+let mostrandoHist = false;
+async function showHistorial() {
+  mostrandoHist = !mostrandoHist;
+  const sec = document.getElementById("histSection");
+  const chips = document.getElementById("chipsSection");
+  if (!mostrandoHist) { sec.style.display="none"; chips.style.display="block"; return; }
+  sec.style.display="block"; chips.style.display="none";
+  hideResults();
+  document.getElementById("histContent").innerHTML = '<div class="hist-empty">Cargando...</div>';
+  try {
+    const rows = await sbGet("cotizaciones","order=created_at.desc&limit=20");
+    if (!rows.length) {
+      document.getElementById("histContent").innerHTML = '<div class="hist-empty">Sin cotizaciones aún</div>';
+      return;
+    }
+    let html = "";
+    rows.forEach(r => {
+      const fecha = new Date(r.created_at);
+      const fStr = fecha.toLocaleDateString("es-AR",{day:"2-digit",month:"2-digit"}) + " " +
+                   fecha.toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"});
+      const cuota = r.cuota_estimada ? " · USD " + Math.round(r.cuota_estimada).toLocaleString("es-AR") + "/m" : "";
+      html += `<div class="hist-item">
+        <div class="hist-ico">🚜</div>
+        <div class="hist-info">
+          <div class="hist-vend">${esc(r.vendedor_nombre||"")}</div>
+          <div class="hist-maq">${esc(r.maquinaria_nom||r.consulta_texto||"")}</div>
+          <div class="hist-det">${esc(r.banco||"")}${r.tna_pct?" · "+r.tna_pct+"% TNA":""}${r.plazo_meses?" · "+r.plazo_meses+"m":""}${cuota}</div>
+        </div>
+        <div class="hist-fecha">${fStr}</div>
+      </div>`;
+    });
+    document.getElementById("histContent").innerHTML = html;
+  } catch(e) {
+    document.getElementById("histContent").innerHTML = '<div class="hist-empty">Error al cargar historial</div>';
+  }
+}
+
+// ══════════════════════════════════════════════
+//  VOZ
+// ══════════════════════════════════════════════
+let recog = null, isRec = false;
+
+function initSpeech() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return false;
+  recog = new SR();
+  recog.lang = "es-AR"; recog.continuous = false; recog.interimResults = true;
+  recog.onresult = e => {
+    let final="", interim="";
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal) final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    showTr(final||interim);
+    if(final) procesarConsulta(final);
+  };
+  recog.onerror = e => { stopRec(); if(e.error!=="no-speech") showErr("Error micrófono: "+e.error); };
+  recog.onend = () => stopRec();
+  return true;
+}
+
+function setMicDis(d) { document.getElementById("micBtn").classList.toggle("dis",d); }
+
+function toggleMic() {
+  if(!datosListos) return;
+  if(!S.get("key")) { openModal(); return; }
+  isRec ? stopRec() : startRec();
+}
+
+function startRec() {
+  if(!recog && !initSpeech()){ showErr("Usá Chrome en Android para la función de voz."); return; }
+  try {
+    recog.start(); isRec=true;
+    document.getElementById("micBtn").classList.add("rec");
+    document.getElementById("micIco").innerText="⏹️";
+    document.getElementById("micLbl").innerText="Parar";
+    document.getElementById("micRings").classList.add("on");
+    document.getElementById("voiceHint").innerText="Estoy escuchando...";
+    hideResults();
+    document.getElementById("histSection").style.display="none";
+    document.getElementById("chipsSection").style.display="block";
+    mostrandoHist=false;
+  } catch(e){}
+}
+
+function stopRec() {
+  isRec=false;
+  if(recog) try{recog.stop()}catch(e){}
+  document.getElementById("micBtn").classList.remove("rec");
+  document.getElementById("micIco").innerText="🎙️";
+  document.getElementById("micLbl").innerText="Hablar";
+  document.getElementById("micRings").classList.remove("on");
+  document.getElementById("voiceHint").innerText="Presioná y decí qué querés cotizar.";
+}
+
+function showTr(t) {
+  document.getElementById("trBox").classList.add("on");
+  document.getElementById("trTxt").innerText='"'+t+'"';
+}
+
+function enviarTexto(t) {
+  if(!datosListos||!S.get("key")){ openModal(); return; }
+  showTr(t); procesarConsulta(t);
+}
+
+// ══════════════════════════════════════════════
+//  CLAUDE API
+// ══════════════════════════════════════════════
+async function procesarConsulta(texto) {
+  stopRec(); hideResults(); setThink(true); hideErr();
+  document.getElementById("loadBox").style.display="block";
+  document.getElementById("chipsSection").style.display="none";
+
+  const ctx = JSON.stringify({ maquinaria: MAQUINARIA, financiacion: FINANCIACION });
+  const sys = `Sos un cotizador de maquinaria agrícola John Deere para vendedores argentinos.
+Datos actualizados en tiempo real desde Supabase:
+${ctx}
+
+Respondé SOLO con un objeto JSON válido, sin texto extra, sin markdown.
+Formato:
+{
+  "tipo": "cotizacion"|"lista"|"info",
+  "mensaje": "texto breve (1 línea)",
+  "maquinas": [objetos maquinaria coincidentes],
+  "bancos": {
+    "Banco Nación": [líneas que aplican con precio <= monto_max_usd],
+    "Banco Galicia": [líneas que aplican con precio <= monto_max_usd]
+  },
+  "nota": "observación si hace falta"
+}
+Para cada línea agregar "cuotaEstimada":
+- Francesa: cuota = capital × TEM×(1+TEM)^n / ((1+TEM)^n-1), TEM=(1+tna_pct/100)^(1/12)-1
+- Capital+Int: cuota1 = capital/plazo + capital×TEM
+- capital = precio_usd × (1 - anticipo_min_pct/100)
+Si precio_usd > monto_max_usd: no incluir esa línea.
+Español rioplatense, lenguaje de vendedor de campo.`;
+
+  try {
+    const resp = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","x-api-key":S.get("key"),"anthropic-version":"2023-06-01"},
+      body:JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:3000, system:sys,
+        messages:[{role:"user",content:texto}] })
+    });
+    if(!resp.ok){ const e=await resp.json(); throw new Error(e.error?.message||"Error API "+resp.status); }
+    const data = await resp.json();
+    const raw = data.content.map(c=>c.text||"").join("");
+    let parsed;
+    try{ parsed=JSON.parse(raw.replace(/```json|```/g,"").trim()); }
+    catch(e){ parsed={tipo:"info",mensaje:raw,maquinas:[],bancos:{}}; }
+    document.getElementById("loadBox").style.display="none";
+    setThink(false);
+    renderResultado(parsed);
+    guardarCotizacion(texto, parsed);
+  } catch(e) {
+    document.getElementById("loadBox").style.display="none";
+    setThink(false);
+    showErr("Error: "+e.message);
+    document.getElementById("chipsSection").style.display="block";
+  }
+}
+
+// ══════════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════════
+function fUSD(n){ return "USD "+Math.round(n).toLocaleString("es-AR"); }
+function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function dispCls(v){
+  v=(v||"").toLowerCase();
+  if(v.includes("stock")) return "b-stock";
+  if(v.includes("pedido")) return "b-pedido";
+  if(v==="excelente") return "b-exc";
+  if(v.includes("muy")) return "b-mb";
+  if(v==="bueno") return "b-bue";
+  if(v==="regular") return "b-reg";
+  return "b-stock";
+}
+
+function renderResultado(data) {
+  const sec=document.getElementById("resSec");
+  const con=document.getElementById("resContent");
+  sec.classList.add("on");
+  document.getElementById("nuevaBtn").classList.add("on");
+  let html="";
+
+  if(data.mensaje) html+=`<div class="ai-bub"><div class="ai-lbl">✦ ASISTENTE</div><div class="ai-txt">${esc(data.mensaje)}</div></div>`;
+
+  if(data.maquinas?.length){
+    html+='<div style="margin-top:11px">';
+    data.maquinas.forEach(m=>{
+      const px=parseFloat(m.precio_usd||0);
+      const pxN=parseFloat(m.precio_nuevo_usd||0);
+      const disp=m.disponibilidad||m.estado||"";
+      html+=`<div class="maq-card"><div class="maq-row">
+        <div class="maq-info">
+          <div class="maq-cod">${esc(m.codigo)}</div>
+          <div class="maq-nom">${esc(m.modelo||m.descripcion)}</div>
+          <div class="maq-desc">${esc(m.descripcion)}</div>
+          ${m.anio?`<div class="maq-desc" style="margin-top:3px">📅 ${m.anio}${m.horas_motor?" · "+parseInt(m.horas_motor).toLocaleString("es-AR")+" hs":""}</div>`:""}
+          ${m.potencia_hp?`<div class="maq-desc">${m.potencia_hp} HP</div>`:""}
+          <div class="badge ${dispCls(disp)}"><span>●</span> ${esc(disp)}</div>
+        </div>
+        <div class="maq-px">
+          <div class="px-usd">$${(px/1000).toFixed(0)}k</div>
+          <div class="px-lbl">USD</div>
+          ${pxN?`<div style="font-size:10px;color:var(--t3);margin-top:3px">Nuevo: $${(pxN/1000).toFixed(0)}k</div>`:""}
+        </div>
+      </div></div>`;
+    });
+    html+="</div>";
+  }
+
+  const bancos=data.bancos||{};
+  Object.keys(bancos).filter(b=>bancos[b]?.length).forEach(banco=>{
+    const bCls=banco.includes("Nación")?"bb-bna":"bb-gal";
+    const bLbl=banco.includes("Nación")?"BNA":"GALICIA";
+    html+=`<div class="banco-hdr"><div class="banco-nm">${esc(banco)}</div><div class="banco-badge ${bCls}">${bLbl}</div></div>`;
+    bancos[banco].forEach(lin=>{
+      if(lin.fuera_de_rango) return;
+      const tna=parseFloat(lin.tna_pct||0);
+      const plazo=parseInt(lin.plazo_meses||0);
+      const ant=parseFloat(lin.anticipo_min_pct||0);
+      const sis=lin.sistema_cuotas||lin.cuotas||"";
+      const nom=lin.linea||"";
+      const obs=lin.observaciones||lin.destino||"";
+      const cuota=lin.cuotaEstimada;
+      const maq=data.maquinas?.[0];
+      const px=maq?parseFloat(maq.precio_usd||0):0;
+      html+=`<div class="lin-card">
+        <div class="lin-nom">${esc(nom)}</div>
+        <div class="lin-grid">
+          <div><div class="d-lbl">TNA</div><div class="d-val hl">${tna}%</div></div>
+          <div><div class="d-lbl">Plazo</div><div class="d-val">${plazo} meses</div></div>
+          <div><div class="d-lbl">Sistema</div><div class="d-val" style="font-size:12px">${esc(sis)}</div></div>
+          <div><div class="d-lbl">Anticipo mín.</div><div class="d-val">${ant}%</div></div>
+        </div>`;
+      if(cuota&&px){
+        const cap=px*(1-ant/100);
+        html+=`<div class="cuota-ban">
+          <div>
+            <div class="cuota-txt">${sis==="Francesa"?"Cuota fija est.":"1ra cuota est."}</div>
+            <div class="cuota-cap">Capital: ${fUSD(cap)}</div>
+          </div>
+          <div><div class="cuota-monto">${fUSD(cuota)}</div><div class="cuota-mes">/mes</div></div>
+        </div>
+        <div class="ant-row"><span>Anticipo (${ant}%)</span><span class="ant-val">${fUSD(px*ant/100)}</span></div>`;
+      }
+      html+=`<div class="obs-txt">ℹ️ ${esc(obs)}</div></div>`;
+    });
+    html+='<div class="sep"></div>';
+  });
+
+  if(data.nota) html+=`<div style="font-size:11px;color:var(--t3);padding:7px 0;line-height:1.5">⚠️ ${esc(data.nota)}</div>`;
+  con.innerHTML=html;
+  window.lastTxt=con.innerText;
+  sec.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function speakResult(){
+  if(!window.lastTxt) return;
+  const u=new SpeechSynthesisUtterance(window.lastTxt.substring(0,500));
+  u.lang="es-AR"; u.rate=0.95;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+
+// ══════════════════════════════════════════════
+//  UI
+// ══════════════════════════════════════════════
+function setThink(on){
+  document.getElementById("micBtn").classList.toggle("think",on);
+  document.getElementById("micIco").innerText=on?"🤔":"🎙️";
+  document.getElementById("micLbl").innerText=on?"Pensando":"Hablar";
+}
+function hideResults(){
+  document.getElementById("resSec").classList.remove("on");
+  document.getElementById("nuevaBtn").classList.remove("on");
+}
+function hideErr(){ const e=document.getElementById("errBox"); e.classList.remove("on"); e.innerText=""; }
+function showErr(m){ const e=document.getElementById("errBox"); e.classList.add("on"); e.innerText=m; }
+function nuevaConsulta(){
+  hideResults(); hideErr();
+  document.getElementById("trBox").classList.remove("on");
+  document.getElementById("chipsSection").style.display="block";
+  document.getElementById("histSection").style.display="none";
+  mostrandoHist=false;
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function showToast(msg){
+  const t=document.createElement("div");
+  t.style.cssText="position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#2d5a1b;color:#e8f0e0;padding:9px 16px;border-radius:18px;font-size:13px;z-index:400;font-weight:600;white-space:nowrap;";
+  t.innerText=msg; document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2400);
+}
+
+// ══════════════════════════════════════════════
+//  PANEL ADMIN
+// ══════════════════════════════════════════════
+let adminTabActual = "resumen";
+
+function openAdmin() { 
+  document.getElementById("adminScreen").classList.add("on");
+  adminTab("resumen");
+}
+function closeAdmin() { document.getElementById("adminScreen").classList.remove("on"); }
+
+function adminTab(tab) {
+  adminTabActual = tab;
+  document.querySelectorAll(".admin-tab").forEach(t => t.classList.remove("on"));
+  document.getElementById("tab-" + tab).classList.add("on");
+  renderAdminTab(tab);
+}
+
+async function renderAdminTab(tab) {
+  const body = document.getElementById("adminBody");
+  body.innerHTML = '<div style="text-align:center;padding:24px;color:var(--t3)"><div class="ld-dots"><span></span><span></span><span></span></div></div>';
+
+  if (tab === "resumen") {
+    try {
+      const [maq, fin, vend, cot] = await Promise.all([
+        sbGet("maquinaria","select=count","count=exact"),
+        sbGet("financiacion","select=count","count=exact"),
+        sbGet("vendedores","select=count","count=exact"),
+        sbGet("cotizaciones","select=count","count=exact")
+      ]);
+      const hoy = await sbGet("cotizaciones", `created_at=gte.${new Date().toISOString().split('T')[0]}&select=count`, "count=exact");
+      body.innerHTML = `
+        <div class="admin-section">
+          <div class="admin-sec-title">Base de datos</div>
+          <div class="stat-grid">
+            <div class="stat-item"><div class="stat-val">${MAQUINARIA.length}</div><div class="stat-lbl">Máquinas</div></div>
+            <div class="stat-item"><div class="stat-val">${FINANCIACION.length}</div><div class="stat-lbl">Líneas banco</div></div>
+            <div class="stat-item"><div class="stat-val" id="statVend">...</div><div class="stat-lbl">Vendedores</div></div>
+            <div class="stat-item"><div class="stat-val" id="statCot">...</div><div class="stat-lbl">Cotizaciones</div></div>
+          </div>
+        </div>
+        <div class="admin-section">
+          <div class="admin-sec-title">Últimas cotizaciones hoy</div>
+          <div id="resumenHoy"><div class="hist-empty" style="text-align:center;padding:12px;color:var(--t3);font-size:13px">Cargando...</div></div>
+        </div>`;
+      // Cargar conteos y cotizaciones hoy
+      const vendRows = await sbGet("vendedores","select=id");
+      const cotRows  = await sbGet("cotizaciones","select=id");
+      const hoyRows  = await sbGet("cotizaciones",`created_at=gte.${new Date().toISOString().split('T')[0]}&order=created_at.desc&limit=5`);
+      document.getElementById("statVend").innerText = vendRows.length;
+      document.getElementById("statCot").innerText  = cotRows.length;
+      let hoyHtml = hoyRows.length ? "" : '<div style="text-align:center;padding:12px;color:var(--t3);font-size:13px">Sin cotizaciones hoy</div>';
+      hoyRows.forEach(r => {
+        const h = new Date(r.created_at).toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"});
+        hoyHtml += `<div class="hist-item">
+          <div class="hist-ico">🚜</div>
+          <div class="hist-info">
+            <div class="hist-vend">${esc(r.vendedor_nombre||"")}</div>
+            <div class="hist-maq">${esc(r.maquinaria_nom||r.consulta_texto||"")}</div>
+            <div class="hist-det">${esc(r.banco||"")}${r.tna_pct?" · "+r.tna_pct+"% TNA":""}</div>
+          </div>
+          <div class="hist-fecha">${h}</div>
+        </div>`;
+      });
+      document.getElementById("resumenHoy").innerHTML = hoyHtml;
+    } catch(e) { body.innerHTML = `<div class="err-box on">Error: ${e.message}</div>`; }
+
+  } else if (tab === "vendedores") {
+    try {
+      const vends = await sbGet("vendedores","order=id");
+      let html = `<div class="admin-section">
+        <div class="admin-sec-title">Vendedores activos</div>`;
+      vends.forEach(v => {
+        html += `<div class="vend-item">
+          <div class="vend-info">
+            <div class="vend-nombre">${esc(v.nombre)} ${!v.activo?'<span style="color:#e57070;font-size:10px">(inactivo)</span>':''}</div>
+            <div class="vend-pin">PIN: ${esc(v.pin)}</div>
+          </div>
+          <div class="vend-actions">
+            <button class="vend-btn tog" onclick="toggleVendedor(${v.id},${v.activo})">${v.activo?"Desactivar":"Activar"}</button>
+            <button class="vend-btn del" onclick="eliminarVendedor(${v.id},'${esc(v.nombre)}')">Eliminar</button>
+          </div>
+        </div>`;
+      });
+      html += `</div>
+      <div class="admin-section">
+        <div class="admin-sec-title">Agregar vendedor</div>
+        <div class="add-vend-form">
+          <input type="text" class="add-inp" id="newNombre" placeholder="Nombre" />
+          <input type="text" class="add-inp" id="newPin" placeholder="PIN (4 dígitos)" maxlength="4" style="max-width:120px"/>
+          <button class="add-btn" onclick="agregarVendedor()">+ Agregar</button>
+        </div>
+        <div id="addVendMsg" style="font-size:12px;margin-top:8px"></div>
+      </div>`;
+      body.innerHTML = html;
+    } catch(e) { body.innerHTML = `<div class="err-box on">Error: ${e.message}</div>`; }
+
+  } else if (tab === "historial") {
+    body.innerHTML = `<div class="admin-section">
+      <div class="admin-sec-title">Historial de cotizaciones</div>
+      <div class="hist-filters">
+        <select class="filter-sel" id="filtroVend" onchange="filtrarHistorial()">
+          <option value="">Todos los vendedores</option>
+        </select>
+        <button class="export-btn" onclick="exportarCSV()">📥 Exportar CSV</button>
+      </div>
+      <div id="histAdminContent"><div style="text-align:center;padding:16px;color:var(--t3)">Cargando...</div></div>
+    </div>`;
+    // Poblar filtro de vendedores
+    try {
+      const vends = await sbGet("vendedores","order=nombre&activo=eq.true");
+      const sel = document.getElementById("filtroVend");
+      vends.forEach(v => { const o=document.createElement("option"); o.value=v.nombre; o.innerText=v.nombre; sel.appendChild(o); });
+    } catch(e){}
+    filtrarHistorial();
+
+  } else if (tab === "config") {
+    body.innerHTML = `<div class="admin-section">
+      <div class="admin-sec-title">API Key de Anthropic</div>
+      <div style="font-size:12px;color:var(--t2);margin-bottom:10px;line-height:1.5">
+        Esta clave permite el motor de cotización con IA. Se guarda en este dispositivo.
+        Obtené la tuya en <strong style="color:var(--am)">console.anthropic.com</strong>
+      </div>
+      <div class="api-row">
+        <input type="password" class="api-inp" id="apiKeyAdmin" placeholder="sk-ant-api03-..." value="${S.get("key")}" />
+        <button class="api-save" onclick="guardarApiKey()">Guardar</button>
+      </div>
+      <div class="api-hint">La clave se guarda solo en este dispositivo. Para distribuir la app con la clave ya cargada, guardala acá y enviá el archivo HTML a los vendedores.</div>
+    </div>
+    <div class="admin-section">
+      <div class="admin-sec-title">Datos</div>
+      <div style="font-size:12px;color:var(--t2);margin-bottom:10px">
+        Para actualizar precios o tasas: editá los XLS y corré <code style="color:var(--am)">python importar_datos.py</code> nuevamente.
+      </div>
+      <button class="add-btn" style="background:var(--cb);color:var(--t2);border:1px solid var(--br)" onclick="recargarDatos();closeAdmin()">🔄 Recargar datos ahora</button>
+    </div>`;
+  }
+}
+
+async function filtrarHistorial() {
+  const filtro = document.getElementById("filtroVend")?.value || "";
+  const con = document.getElementById("histAdminContent");
+  if (con) con.innerHTML = '<div style="text-align:center;padding:16px;color:var(--t3)">Cargando...</div>';
+  try {
+    let params = "order=created_at.desc&limit=50";
+    if (filtro) params += `&vendedor_nombre=eq.${encodeURIComponent(filtro)}`;
+    const rows = await sbGet("cotizaciones", params);
+    if (!rows.length) { con.innerHTML = '<div style="text-align:center;padding:16px;color:var(--t3);font-size:13px">Sin cotizaciones</div>'; return; }
+    let html = `<div style="overflow-x:auto"><table class="hist-table">
+      <tr><th>Fecha</th><th>Vendedor</th><th>Máquina</th><th>Banco</th><th>TNA</th><th>Cuota</th></tr>`;
+    rows.forEach(r => {
+      const f = new Date(r.created_at);
+      const fs = f.toLocaleDateString("es-AR",{day:"2-digit",month:"2-digit"})+" "+f.toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"});
+      html += `<tr>
+        <td style="white-space:nowrap;color:var(--t3)">${fs}</td>
+        <td><span class="tag-vend">${esc(r.vendedor_nombre||"")}</span></td>
+        <td>${esc(r.maquinaria_nom||r.consulta_texto||"")}</td>
+        <td style="color:var(--t3)">${esc(r.banco||"")}</td>
+        <td>${r.tna_pct?r.tna_pct+"%":""}</td>
+        <td style="white-space:nowrap">${r.cuota_estimada?"USD "+Math.round(r.cuota_estimada).toLocaleString("es-AR"):""}</td>
+      </tr>`;
+    });
+    html += "</table></div>";
+    con.innerHTML = html;
+    window._histRows = rows;
+  } catch(e) { con.innerHTML = `<div class="err-box on">Error: ${e.message}</div>`; }
+}
+
+async function agregarVendedor() {
+  const nombre = document.getElementById("newNombre").value.trim();
+  const pin    = document.getElementById("newPin").value.trim();
+  const msg    = document.getElementById("addVendMsg");
+  if (!nombre || pin.length !== 4 || !/^\d{4}$/.test(pin)) {
+    msg.style.color="#e57070"; msg.innerText="Ingresá nombre y PIN de 4 dígitos numéricos."; return;
+  }
+  try {
+    const code = await sbPost("vendedores", {nombre, pin, activo: true});
+    if (code === 201) { msg.style.color="#7fc45e"; msg.innerText="✅ Vendedor agregado"; adminTab("vendedores"); }
+    else { msg.style.color="#e57070"; msg.innerText="Error al guardar (¿PIN ya existe?)"; }
+  } catch(e) { msg.style.color="#e57070"; msg.innerText="Error: "+e.message; }
+}
+
+async function toggleVendedor(id, activo) {
+  await fetch(`${SB_URL}/rest/v1/vendedores?id=eq.${id}`, {
+    method:"PATCH", headers:{...SB_HDR,"Prefer":"return=minimal"}, body:JSON.stringify({activo:!activo})
+  });
+  adminTab("vendedores");
+}
+
+async function eliminarVendedor(id, nombre) {
+  if (!confirm(`¿Eliminar a ${nombre}? Sus cotizaciones se conservan.`)) return;
+  await fetch(`${SB_URL}/rest/v1/vendedores?id=eq.${id}`, { method:"DELETE", headers:SB_HDR });
+  adminTab("vendedores");
+}
+
+function guardarApiKey() {
+  const k = document.getElementById("apiKeyAdmin").value.trim();
+  if (k) { S.set("key",k); showToast("✅ API key guardada"); }
+}
+
+function exportarCSV() {
+  const rows = window._histRows || [];
+  if (!rows.length) return;
+  const headers = ["Fecha","Vendedor","Máquina","Banco","Línea","TNA%","Plazo","Cuota USD","Anticipo USD"];
+  const lines = rows.map(r => [
+    new Date(r.created_at).toLocaleString("es-AR"),
+    r.vendedor_nombre||"",
+    r.maquinaria_nom||"",
+    r.banco||"",
+    r.linea||"",
+    r.tna_pct||"",
+    r.plazo_meses||"",
+    r.cuota_estimada?Math.round(r.cuota_estimada):"",
+    r.anticipo_usd?Math.round(r.anticipo_usd):""
+  ].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(","));
+  const csv = [headers.join(","), ...lines].join("\n");
+  const blob = new Blob(["\uFEFF"+csv], {type:"text/csv;charset=utf-8;"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `cotizaciones_${new Date().toISOString().split("T")[0]}.csv`;
+  a.click();
+}
+
+// Wrapper sbGet con count
+async function sbGet(tabla, params="", extra="") {
+  const url = `${SB_URL}/rest/v1/${tabla}?${params}`;
+  const hdrs = {...SB_HDR};
+  if (extra) hdrs["Prefer"] = extra;
+  const r = await fetch(url, {headers: hdrs});
+  if (!r.ok) throw new Error(`Supabase error ${r.status}`);
+  return r.json();
+}
+
+// MODAL
+function openModal(){ document.getElementById("apiKeyMod").value=S.get("key"); document.getElementById("modalOv").classList.add("on"); }
+function closeModal(){ document.getElementById("modalOv").classList.remove("on"); }
+function closeModalOut(e){ if(e.target.id==="modalOv") closeModal(); }
+function saveModal(){ const k=document.getElementById("apiKeyMod").value.trim(); if(k) S.set("key",k); closeModal(); showToast("✅ Configuración guardada"); }
+function recargarDatos(){ closeModal(); cargarDatos(false); }
+
+// INIT
+initSpeech();
+// Mostrar login — si hay vendedor en sesión, lo restauramos
+const savedId = S.get("vendedorId");
+const savedNom = S.get("vendedorNombre");
+if(savedId && savedNom){
+  vendedorActual = { id: parseInt(savedId), nombre: savedNom };
+  document.getElementById("loginScreen").style.display="none";
+  document.getElementById("vendedorChip").innerText=savedNom;
+  document.getElementById("hdrSub").innerText=savedNom+" · BNA · GALICIA";
+  if(S.get("isAdmin")==="1") document.getElementById("adminBtn").style.display="flex";
+  cargarDatos();
+}
+</script>
+</body>
+</html>
